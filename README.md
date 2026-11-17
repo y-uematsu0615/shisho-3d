@@ -1,4 +1,4 @@
-# 支承 3Dモデル集
+# 支承・伸縮装置 3Dモデル集
 
 支承・伸縮装置の3Dビューア（ブラウザで動く単体HTML）。公開URL: https://y-uematsu0615.github.io/shisho-3d/
 
