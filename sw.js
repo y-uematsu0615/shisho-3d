@@ -1,6 +1,6 @@
 // Offline support. Shell (index, icons, thumbnails) is precached; each model HTML is cached when opened
 // or when 「全モデルをオフライン保存」 is pressed. Models: cache first, refreshed in the background.
-const VER = 'shisho-22ddd8b69b53';
+const VER = 'shisho-e5842d9302c5';
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-512.png", "thumbs/BPB-400M.jpg", "thumbs/BPB-400F.jpg", "thumbs/RB-500F.jpg", "thumbs/RB-430M.jpg", "thumbs/mageba.jpg", "thumbs/maurer-joint.jpg", "thumbs/maurer-swivel.jpg", "thumbs/S01.jpg", "thumbs/S04.jpg", "thumbs/S05.jpg", "thumbs/S06.jpg", "thumbs/S07.jpg", "thumbs/S08.jpg", "thumbs/S09.jpg", "thumbs/S10.jpg", "thumbs/S11.jpg", "thumbs/S12.jpg", "thumbs/S13.jpg", "thumbs/S14.jpg", "thumbs/S16.jpg", "thumbs/S17.jpg", "thumbs/S18.jpg"];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VER).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
