@@ -5294,7 +5294,7 @@ li[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 16%, tra
 <script>
 const PARTS = {"1": {"name": "上沓取付ボルト（名称推定）", "mat": "高力ボルト（推定）", "qty": "4", "kg": null, "text": "上沓を桁に固定する。"}, "2": {"name": "上沓", "mat": "鋳鋼（推定）", "qty": "1", "kg": null, "text": "下面に球凹面を持つ。上面の突起でせん断力を桁に伝える。"}, "3": {"name": "カラー（名称推定）", "mat": "鋼（推定）", "qty": "2", "kg": null, "text": "2つ割りのリング。ピボット部を囲み、上沓の抜け出しとごみの侵入を防ぐ。ボルトで締結する。"}, "4": {"name": "下沓", "mat": "鋳鋼（推定）", "qty": "1", "kg": null, "text": "中央の球凸面で上沓を受け、全方向の回転を許す。"}, "5": {"name": "アンカーボルト・ナット", "mat": "鋼（推定）", "qty": "4", "kg": null, "text": "下沓を下部工に定着する。"}};
 // r: camera distance (m) assembled, rx: added at full explode, y0/y1: target height assembled/exploded
-const CFG = {"r": 2.3, "rx": 1.0, "y0": 0.05, "y1": 0.18, "ground": -0.7, "first": 4};
+const CFG = {"r": 2.3, "rx": 1.0, "y0": 0.05, "y1": 0.18, "ground": -0.7, "first": 4, "behave": [{"key": "vert", "label": "\u925b\u76f4\u8377\u91cd", "title": "\u925b\u76f4\u8377\u91cd\u306e\u652f\u6301", "wave": "01", "period": 3, "view": "front", "path": ["1", "2", "4", "5"], "text": ["\u8377\u91cd\u306e\u6d41\u308c\uff08\u30aa\u30ec\u30f3\u30b8\u306e\u90e8\u6750\uff09\uff1a\u4e0a\u6c93 \u2192 \u7403\u9762\uff08\u30d4\u30dc\u30c3\u30c8\uff09\u2192 \u4e0b\u6c93 \u2192 \u30a2\u30f3\u30ab\u30fc\u30dc\u30eb\u30c8\u30fb\u4e0b\u90e8\u5de5\u3002\u4e0a\u6c93\u306e\u7403\u51f9\u9762\u304c\u4e0b\u6c93\u306e\u7403\u51f8\u9762\u306b\u8f09\u3063\u3066\u3001\u9762\u3067\u8377\u91cd\u3092\u4f1d\u3048\u307e\u3059\u3002"], "note": "\u92fc\u88fd\u652f\u627f\u306a\u306e\u3067\u3001\u8377\u91cd\u306b\u3088\u308b\u5909\u5f62\u306f\u76ee\u306b\u898b\u3048\u306a\u3044\u5927\u304d\u3055\u3067\u3059\u3002\u52d5\u304d\u306f\u4ed8\u3051\u305a\u3001\u529b\u306e\u6d41\u308c\u3060\u3051\u3092\u793a\u3057\u3066\u3044\u307e\u3059\u3002", "arrows": [{"from": [0, 0, 413], "to": [0, 0, 255]}, {"from": [-220, 0, -140], "to": [-220, 0, -12], "color": "#1f6fb2"}, {"from": [220, 0, -140], "to": [220, 0, -12], "color": "#1f6fb2"}]}, {"key": "horiz", "label": "\u6c34\u5e73\u529b", "title": "\u6c34\u5e73\u529b\u306e\u652f\u6301", "wave": "01", "period": 3, "view": "side", "path": ["2", "3", "4", "5"], "text": ["\u56fa\u5b9a\u652f\u627f\u306a\u306e\u3067\u6c34\u5e73\u65b9\u5411\u306b\u306f\u52d5\u304d\u307e\u305b\u3093\u3002\u6c34\u5e73\u529b\u306f\u7403\u9762\u306e\u304b\u307f\u5408\u3044\u3092\u901a\u3063\u3066\u4e0b\u6c93\u3078\u4f1d\u308f\u308a\u307e\u3059\u3002\u30ab\u30e9\u30fc\u306f\u4e0a\u6c93\u304c\u5916\u308c\u308b\u306e\u3092\u9632\u304e\u307e\u3059\u3002"], "note": "\u92fc\u88fd\u652f\u627f\u306a\u306e\u3067\u3001\u8377\u91cd\u306b\u3088\u308b\u5909\u5f62\u306f\u76ee\u306b\u898b\u3048\u306a\u3044\u5927\u304d\u3055\u3067\u3059\u3002\u52d5\u304d\u306f\u4ed8\u3051\u305a\u3001\u529b\u306e\u6d41\u308c\u3060\u3051\u3092\u793a\u3057\u3066\u3044\u307e\u3059\u3002", "arrows": [{"from": [0, -390, 120], "to": [0, -232, 120]}]}, {"key": "rot", "label": "\u56de\u8ee2\uff1a\u6a4b\u8ef8\u65b9\u5411", "title": "\u56de\u8ee2\u306e\u5438\u53ce\uff08\u6a4b\u8ef8\u65b9\u5411\uff09", "wave": "pm", "period": 4, "view": "side", "rot": {"re": "^(01_|02_|03_)", "axis": [1, 0, 0], "deg": 1.5, "pivot": [0, 0, 30.5]}, "path": ["2", "4"], "text": ["\u4e0a\u6c93\u304c\u4e0b\u6c93\u306e\u7403\u9762\u306e\u4e0a\u3067\u56de\u308a\u307e\u3059\uff08\u30aa\u30ec\u30f3\u30b8\u306e\u90e8\u6750\uff09\u3002\u3053\u308c\u306f\u6a4b\u8ef8\u65b9\u5411\u306e\u50be\u304d\uff08\u6841\u306e\u305f\u308f\u307f\uff09\u3067\u3059\u3002"], "note": "\u8a2d\u8a08\u56de\u8ee2\u89d2\u306f\u3053\u306e\u56f3\u306b\u8a18\u8f09\u304c\u3042\u308a\u307e\u305b\u3093\u3002\u8868\u793a\u306e 1.5\u00b0 \u306f\u898b\u3084\u3059\u304f\u3059\u308b\u305f\u3081\u306e\u8a87\u5f35\u3067\u3001\u5b9f\u969b\u306e\u56de\u8ee2\u89d2\u306f\u3053\u308c\u3088\u308a\u5c0f\u3055\u304f\u306a\u308a\u307e\u3059\uff08\u63a8\u5b9a\uff09\u3002"}, {"key": "rot2", "label": "\u56de\u8ee2\uff1a\u6a4b\u8ef8\u76f4\u89d2", "title": "\u56de\u8ee2\u306e\u5438\u53ce\uff08\u6a4b\u8ef8\u76f4\u89d2\u65b9\u5411\uff09", "wave": "pm", "period": 4, "view": "front", "rot": {"re": "^(01_|02_|03_)", "axis": [0, 1, 0], "deg": 1.5, "pivot": [0, 0, 30.5]}, "path": ["2", "4"], "text": ["\u7403\u9762\u306a\u306e\u3067\u3001\u6a4b\u8ef8\u76f4\u89d2\u65b9\u5411\u306e\u50be\u304d\u306b\u3082\u540c\u3058\u3088\u3046\u306b\u56de\u308a\u307e\u3059\u3002\u30d4\u30dc\u30c3\u30c8\u652f\u627f\u306f\u5168\u65b9\u5411\u306b\u56de\u8ee2\u3067\u304d\u308b\u306e\u304c\u7279\u9577\u3067\u3001\u659c\u6a4b\u3084\u66f2\u7dda\u6a4b\u306b\u4f7f\u308f\u308c\u307e\u3059\u3002"], "note": "\u8a2d\u8a08\u56de\u8ee2\u89d2\u306f\u3053\u306e\u56f3\u306b\u8a18\u8f09\u304c\u3042\u308a\u307e\u305b\u3093\u3002\u8868\u793a\u306e 1.5\u00b0 \u306f\u898b\u3084\u3059\u304f\u3059\u308b\u305f\u3081\u306e\u8a87\u5f35\u3067\u3001\u5b9f\u969b\u306e\u56de\u8ee2\u89d2\u306f\u3053\u308c\u3088\u308a\u5c0f\u3055\u304f\u306a\u308a\u307e\u3059\uff08\u63a8\u5b9a\uff09\u3002"}], "behFocus": {"z": 120, "r": 1.4}};
 let F0 = 80, DUR = 36, F1 = 300;
 
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -5438,10 +5438,11 @@ const VIEWS = {
 };
 const liftOf = v => CFG.y0 + v * (CFG.y1 - CFG.y0);
 let camAnim = null;
-function setView(key, animate = true) {
+function setView(key, animate = true, focus = null) {
   const v = VIEWS[key];
-  const r = (CFG.r + explode * CFG.rx) * Math.max(1, 1.15 / camera.aspect) * (cutIdx ? 0.6 : 1);   // closer in on a section
-  const ty = liftOf(explode);
+  // focus = {z: Blender mm, r: m}: frame the bearing body instead of the whole model incl. long anchors (挙動 views)
+  const r = (focus ? focus.r : CFG.r + explode * CFG.rx) * Math.max(1, 1.15 / camera.aspect) * (cutIdx && !focus ? 0.6 : 1);   // closer in on a section
+  const ty = focus ? focus.z / 1000 - focus.r * 0.08 : liftOf(explode);   // a little low: the HUD covers the bottom of the stage
   const to = new THREE.Vector3(r * Math.cos(v.el) * Math.sin(v.az), ty + r * Math.sin(v.el), r * Math.cos(v.el) * Math.cos(v.az));
   const tt = new THREE.Vector3(0, ty, 0);
   if (!animate || matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -5475,8 +5476,9 @@ playBtn.addEventListener("click", () => {
   playBtn.setAttribute("aria-pressed", "true"); playBtn.textContent = "停止";
 });
 const cutBtn = document.getElementById("cut");
-cutBtn.addEventListener("click", () => {
-  cutIdx = (cutIdx + 1) % CUTS.length;
+cutBtn.addEventListener("click", () => setCut((cutIdx + 1) % CUTS.length, true));
+function setCut(i, view) {
+  cutIdx = i;
   const c = CUTS[cutIdx];
   CLIP[0].normal.set(...c.n); CLIP[0].constant = c.d;
   for (const k of caps) {
@@ -5486,9 +5488,9 @@ cutBtn.addEventListener("click", () => {
   paintBalloons();
   select(selected);
   cutBtn.textContent = c.label; cutBtn.setAttribute("aria-pressed", String(cutIdx > 0));
-  if (cutIdx === 1) setView("side"); else if (cutIdx === 2) setView("front");
+  if (view) { if (cutIdx === 1) setView("side"); else if (cutIdx === 2) setView("front"); }
   dirty = true; renderer.shadowMap.needsUpdate = true;
-});
+}
 const spinBtn = document.getElementById("spin");
 spinBtn.addEventListener("click", () => {
   controls.autoRotate = !controls.autoRotate; controls.autoRotateSpeed = 1.6;
@@ -5571,7 +5573,7 @@ const BEH = CFG.behave || [];
 const behSel = document.getElementById("beh"), behInfo = document.getElementById("behInfo"), behTxt = document.getElementById("behTxt");
 let behShow = false;   // explanation card is opt-in (YORU 2026-11-16)
 const behGroup = new THREE.Group(); scene.add(behGroup);
-let beh = null, behT0 = 0;
+let beh = null, behT0 = 0, behCut = false;
 const b2t = v => new THREE.Vector3(v[0], v[2], -v[1]).multiplyScalar(0.001);
 function labelSprite(text, color) {
   const c = document.createElement("canvas"), g = c.getContext("2d"), fs = 40, font = `700 ${fs}px "Zen Kaku Gothic New", sans-serif`;
@@ -5604,18 +5606,21 @@ function behBuild() {
 }
 // rubber parts that follow the plate above them: vertex displacement grows from 0 at the bottom face to full at the top
 const deformCache = new Map();
-function deformRubber(n, xf) {
+// sp (optional) = {axis: "x"|"y"|"z", d: [d0, d1]} (Blender axis, mm): the ramp runs along that axis instead of beh.dz
+const axVal = (ax, x, y, z) => (ax === "x" ? x : ax === "y" ? -z : y) * 1000;   // three-space -> Blender mm along ax
+function deformRubber(n, xf, sp) {
   n.obj.traverse(o => {
     if (!o.isMesh || o.userData.cap) return;
     const pos = o.geometry.attributes.position;
     if (!deformCache.has(o)) { o.geometry.computeBoundingBox(); deformCache.set(o, { a: pos.array.slice(), y0: o.geometry.boundingBox.min.y, y1: o.geometry.boundingBox.max.y }); }
     const c = deformCache.get(o), v = new THREE.Vector3(), w = new THREE.Vector3();
-    const rg = !!(xf && beh.rigid && new RegExp(beh.rigid).test(n.obj.name));
+    const rg = !sp && !!(xf && beh.rigid && new RegExp(beh.rigid).test(n.obj.name));
     for (let i = 0; i < pos.count; i++) {
       v.set(c.a[3 * i], c.a[3 * i + 1], c.a[3 * i + 2]);
       // beh.dz = [z0, z1] (Blender mm): one height ramp shared by a whole laminate; beh.rigid = steel shims that ride along undeformed
       let h = 0;
-      if (xf && beh.dz) { const yy = rg ? (c.y0 + c.y1) / 2 : v.y; h = Math.min(1, Math.max(0, ((yy + n.base.y) * 1000 - beh.dz[0]) / (beh.dz[1] - beh.dz[0]))); }
+      if (xf && sp) { const a = rg ? null : axVal(sp.axis, v.x + n.base.x, v.y + n.base.y, v.z + n.base.z); h = Math.min(1, Math.max(0, (a - sp.d[0]) / (sp.d[1] - sp.d[0]))); }
+      else if (xf && beh.dz) { const yy = rg ? (c.y0 + c.y1) / 2 : v.y; h = Math.min(1, Math.max(0, ((yy + n.base.y) * 1000 - beh.dz[0]) / (beh.dz[1] - beh.dz[0]))); }
       else if (xf) h = (v.y - c.y0) / Math.max(1e-6, c.y1 - c.y0);
       if (h > 0 && rg) { w.set(0, (c.y0 + c.y1) / 2, 0).add(n.base); const w0 = w.clone(); xf(w); w.sub(w0).multiplyScalar(h); v.add(w); pos.setXYZ(i, v.x, v.y, v.z); continue; }
       if (h > 0) { w.copy(v).add(n.base); xf(w); w.sub(n.base).sub(v).multiplyScalar(h); v.add(w); }
@@ -5637,6 +5642,7 @@ function behFrame(now) {
   for (const n of nodes) {
     if (!n.q0) n.q0 = n.obj.quaternion.clone();
     n.obj.position.copy(n.base); n.obj.quaternion.copy(n.q0);
+    if (!n.c0 && (beh.also || beh.deforms)) n.c0 = new THREE.Box3().setFromObject(n.obj).getCenter(new THREE.Vector3());
     const nm = n.obj.name, moving = (reM && reM.test(nm)) || (reR && reR.test(nm));
     if (moving) { const p = n.base.clone(); xf(p); n.obj.position.copy(p); if (rot) n.obj.quaternion.premultiply(q); }
     // steel shims inside a laminate: each one takes the share of the movement/rotation that belongs to its height,
@@ -5649,6 +5655,27 @@ function behFrame(now) {
       if (rot) p.sub(piv).applyQuaternion(qh).add(piv);
       p.addScaledVector(tr, h); n.obj.position.copy(p); n.obj.quaternion.premultiply(qh);
     } else if (beh.deform && new RegExp(beh.deform).test(nm)) deformRubber(n, xf);
+    // beh.deforms: laminates whose ramp runs along another axis (e.g. buffers standing on end); sp.rigid = parts that ride along whole
+    for (const sp of beh.deforms || []) {
+      if (sp.rigid && new RegExp(sp.rigid).test(nm)) {
+        if (!n.c0) n.c0 = new THREE.Box3().setFromObject(n.obj).getCenter(new THREE.Vector3());
+        const h = Math.min(1, Math.max(0, (axVal(sp.axis, n.c0.x, n.c0.y, n.c0.z) - sp.d[0]) / (sp.d[1] - sp.d[0])));
+        const qh = new THREE.Quaternion().slerp(q, h), p = n.base.clone();
+        if (rot) p.sub(piv).applyQuaternion(qh).add(piv);
+        p.addScaledVector(tr, h); n.obj.position.copy(p); n.obj.quaternion.copy(n.q0).premultiply(qh);
+      } else if (new RegExp(sp.re).test(nm)) deformRubber(n, xf, sp);
+    }
+    // beh.also: groups with their own motion on the same beat, e.g. rollers that travel half the stroke and roll,
+    // pinions turning with them. pivot "self" = the part's own centre.
+    for (const a of beh.also || []) {
+      if (!new RegExp(a.re).test(nm)) continue;
+      if (!n.c0) n.c0 = new THREE.Box3().setFromObject(n.obj).getCenter(new THREE.Vector3());
+      const qa = new THREE.Quaternion();
+      if (a.axis) qa.setFromAxisAngle(b2t(a.axis).normalize(), THREE.MathUtils.degToRad(a.deg) * s);
+      const pv = a.pivot === "self" || !a.pivot ? n.c0 : b2t(a.pivot);
+      const p = n.base.clone().sub(pv).applyQuaternion(qa).add(pv).add(b2t(a.t || [0, 0, 0]).multiplyScalar(s));
+      n.obj.position.copy(p); n.obj.quaternion.copy(n.q0).premultiply(qa);
+    }
     const isHit = (beh.hit || []).includes(String(n.part)), isPath = (beh.path || []).includes(String(n.part));
     n.obj.traverse(o => {
       if (!o.isMesh || o.userData.cap) return;
@@ -5662,15 +5689,19 @@ function behFrame(now) {
 }
 function setBehaviour(key) {
   if (beh && beh.deform) for (const n of nodes) if (new RegExp(beh.deform).test(n.obj.name)) deformRubber(n, null);
+  if (beh && beh.deforms) for (const sp of beh.deforms) for (const n of nodes) if (new RegExp(sp.re).test(n.obj.name)) deformRubber(n, null);
   beh = BEH.find(b => b.key === key) || null;
   behSel.value = beh ? beh.key : "";
   behInfo.hidden = !beh || !behShow; behTxt.hidden = !beh;
   if (beh) {
     stopPlay(); if (explode) setExplode(0);
     behInfo.innerHTML = `<h3>${beh.title}</h3>${beh.text.map(p => `<p>${p}</p>`).join("")}${beh.note ? `<p class="note">${beh.note}</p>` : ""}`;
-    behT0 = performance.now(); if (beh.view) setView(beh.view);
+    // beh.cut: show this mode in section (e.g. rollers hidden behind side plates); undo it when the next mode has none
+    if (beh.cut != null) { setCut(beh.cut, false); behCut = true; } else if (behCut) { setCut(0, false); behCut = false; }
+    behT0 = performance.now(); if (beh.view) setView(beh.view, true, beh.focus || CFG.behFocus || null);
   } else {
     for (const n of nodes) if (n.q0) n.obj.quaternion.copy(n.q0);
+    if (behCut) { setCut(0, false); behCut = false; }
     applyExplode(); if (selected != null) select(selected);
   }
   behBuild(); dirty = true; renderer.shadowMap.needsUpdate = true;

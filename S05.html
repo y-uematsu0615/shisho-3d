@@ -5294,7 +5294,7 @@ li[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 16%, tra
 <script>
 const PARTS = {"1": {"name": "上沓取付ボルト（名称推定）", "mat": "高力ボルト（推定）", "qty": "4", "kg": null, "text": "上沓を桁に止める。"}, "2": {"name": "上沓", "mat": "鋼（推定）", "qty": "1", "kg": null, "text": "両端のフランジが負反力装置にかかり、上向きの力を下沓へ伝える。"}, "3": {"name": "ステンレス板", "mat": "SUS（推定）", "qty": "3", "kg": null, "text": "上沓の下面と、両端フランジの面に取り付けるすべり面。"}, "4": {"name": "ふっ素樹脂板（PTFE）", "mat": "PTFE（推定）", "qty": "1", "kg": null, "text": "中間プレートの上面のすべり材。"}, "5": {"name": "中間プレート", "mat": "鋼（推定）", "qty": "1", "kg": null, "text": "ゴムプレートの上に載る。"}, "6": {"name": "シールリング", "mat": "ゴム（推定）", "qty": "1", "kg": null, "text": "ポットへの異物の侵入を防ぐ。"}, "7": {"name": "ゴムプレート", "mat": "クロロプレンゴム（推定）", "qty": "1", "kg": null, "text": "ポットの中に密閉され、回転を吸収する。"}, "8": {"name": "圧縮リング", "mat": "黄銅（推定）", "qty": "1", "kg": null, "text": "ゴムのはみ出しを防ぐ。"}, "9": {"name": "下沓", "mat": "鋳鋼（推定）", "qty": "1", "kg": null, "text": "ポット。両端に下沓凸部があり、負反力装置を取り付ける。"}, "10": {"name": "負反力装置ハウジング（名称推定）", "mat": "鋳鋼（推定）", "qty": "2", "kg": null, "text": "上沓のフランジを上下からはさみ、桁が浮き上がろうとする力を下沓凸部へ伝える。橋軸方向にはすべって動ける。"}, "11": {"name": "すべり材（名称推定）", "mat": "PTFE（推定）", "qty": "2", "kg": null, "text": "フランジ上面側のすべり材。"}, "12": {"name": "押え板（名称推定）", "mat": "鋼（推定）", "qty": "2", "kg": null, "text": "すべり材の裏板。"}, "13": {"name": "すべり材（下側）（名称推定）", "mat": "PTFE（推定）", "qty": "2", "kg": null, "text": "フランジ下面側のすべり材。"}, "14": {"name": "ライナー（名称推定）", "mat": "鋼（推定）", "qty": "2", "kg": null, "text": "高さ調整のライナー。"}};
 // r: camera distance (m) assembled, rx: added at full explode, y0/y1: target height assembled/exploded
-const CFG = {"r": 1.8, "rx": 0.9, "y0": 0.0, "y1": 0.12, "ground": -0.05, "first": 10};
+const CFG = {"r": 1.8, "rx": 0.9, "y0": 0.0, "y1": 0.12, "ground": -0.05, "first": 10, "behave": [{"key": "vert", "label": "\u925b\u76f4\u8377\u91cd", "title": "\u925b\u76f4\u8377\u91cd\u306e\u652f\u6301", "wave": "01", "period": 3, "view": "front", "path": ["1", "2", "3", "4", "5", "7", "9"], "text": ["\u8377\u91cd\u306e\u6d41\u308c\uff08\u30aa\u30ec\u30f3\u30b8\u306e\u90e8\u6750\uff09\uff1a\u4e0a\u6c93 \u2192 \u30b9\u30c6\u30f3\u30ec\u30b9\u677f \u2192 \u3075\u3063\u7d20\u6a39\u8102\u677f \u2192 \u4e2d\u9593\u30d7\u30ec\u30fc\u30c8 \u2192 \u30b4\u30e0\u30d7\u30ec\u30fc\u30c8 \u2192 \u4e0b\u6c93 \u2192 \u4e0b\u90e8\u5de5\u3002"], "note": "\u92fc\u88fd\u652f\u627f\u306a\u306e\u3067\u3001\u8377\u91cd\u306b\u3088\u308b\u5909\u5f62\u306f\u76ee\u306b\u898b\u3048\u306a\u3044\u5927\u304d\u3055\u3067\u3059\u3002\u52d5\u304d\u306f\u4ed8\u3051\u305a\u3001\u529b\u306e\u6d41\u308c\u3060\u3051\u3092\u793a\u3057\u3066\u3044\u307e\u3059\u3002", "arrows": [{"from": [0, 0, 415], "to": [0, 0, 257]}, {"from": [-200, 0, -140], "to": [-200, 0, -12], "color": "#1f6fb2"}, {"from": [200, 0, -140], "to": [200, 0, -12], "color": "#1f6fb2"}]}, {"key": "long", "label": "\u79fb\u52d5\uff1a\u6a4b\u8ef8\u65b9\u5411", "title": "\u6a4b\u8ef8\u65b9\u5411\u306e\u79fb\u52d5", "wave": "pm", "period": 5, "view": "iso", "path": ["3", "4", "11", "13"], "text": ["\u4e0a\u6c93\u306f\u3075\u3063\u7d20\u6a39\u8102\u677f\u306e\u4e0a\u3092\u3059\u3079\u3063\u3066\u6a4b\u8ef8\u65b9\u5411\u306b\u52d5\u304d\u307e\u3059\u3002\u4e21\u7aef\u306e\u30d5\u30e9\u30f3\u30b8\u3082\u8ca0\u53cd\u529b\u88c5\u7f6e\u306e\u4e2d\u306e\u3059\u3079\u308a\u6750\u306e\u9593\u3092\u3059\u3079\u308b\u306e\u3067\u3001\u4e0a\u63da\u529b\u3092\u62bc\u3055\u3048\u305f\u307e\u307e\u52d5\u3051\u307e\u3059\uff08\u30aa\u30ec\u30f3\u30b8\u306e\u90e8\u6750\uff09\u3002"], "note": "\u79fb\u52d5\u91cf\u306f\u3053\u306e\u56f3\u306b\u8a18\u8f09\u304c\u306a\u3044\u305f\u3081\u3001\u00b125 mm \u3067\u8868\u793a\u3057\u3066\u3044\u307e\u3059\uff08\u63a8\u5b9a\uff09\u3002", "move": {"re": "^(01_|02_|03_)", "t": [0, 25, 0]}, "arrows": [{"from": [0, -60, 260], "to": [0, 60, 260], "color": "#1f6fb2"}, {"from": [0, 60, 260], "to": [0, -60, 260], "color": "#1f6fb2"}]}, {"key": "uplift", "label": "\u4e0a\u63da\u529b\uff08\u8ca0\u53cd\u529b\uff09", "title": "\u4e0a\u63da\u529b\uff08\u8ca0\u53cd\u529b\uff09\u306e\u652f\u6301", "wave": "01", "period": 3, "view": "front", "path": ["2", "3", "11", "12", "10", "9"], "text": ["\u6841\u304c\u6301\u3061\u4e0a\u304c\u308d\u3046\u3068\u3059\u308b\u3068\u3001\u4e0a\u6c93\u306e\u4e21\u7aef\u306e\u30d5\u30e9\u30f3\u30b8\u304c\u8ca0\u53cd\u529b\u88c5\u7f6e\u30cf\u30a6\u30b8\u30f3\u30b0\u306e\u4e0a\u5074\u306e\u3059\u3079\u308a\u6750\u306b\u5f53\u305f\u308a\uff08\u8d64\u304f\u5149\u308b\u90e8\u5206\uff09\u3001\u4e0a\u5411\u304d\u306e\u529b\u304c\u4e0b\u6c93\u51f8\u90e8\u3078\u4f1d\u308f\u308a\u307e\u3059\u3002", "\u9023\u7d9a\u6841\u306e\u7aef\u652f\u70b9\u3084\u66f2\u7dda\u6a4b\u306a\u3069\u3001\u652f\u70b9\u306b\u4e0a\u5411\u304d\u306e\u529b\uff08\u8ca0\u53cd\u529b\uff09\u304c\u51fa\u308b\u6240\u306b\u4f7f\u3046\u5f62\u5f0f\u3067\u3059\u3002"], "note": "\u52d5\u304d\u306f\u898b\u3084\u3059\u304f\u3059\u308b\u305f\u3081 2 mm \u3067\u8868\u793a\u3057\u3066\u3044\u307e\u3059\uff08\u63a8\u5b9a\uff09\u3002", "move": {"re": "^(01_|02_|03_)", "t": [0, 0, 2]}, "hit": ["2", "11"], "arrows": [{"from": [-250, 0, 255], "to": [-250, 0, 395], "follow": "^(01_|02_|03_)"}, {"from": [250, 0, 255], "to": [250, 0, 395], "follow": "^(01_|02_|03_)"}]}, {"key": "rot", "label": "\u56de\u8ee2", "title": "\u56de\u8ee2\u306e\u5438\u53ce\uff08\u6841\u306e\u305f\u308f\u307f\u89d2\uff09", "wave": "pm", "period": 4, "view": "side", "rot": {"re": "^(01_|02_|03_|04_|05_|06_|08_)", "axis": [1, 0, 0], "deg": 1.0, "pivot": [0, 0, 35.5]}, "path": ["7", "5"], "text": ["\u4e2d\u9593\u30d7\u30ec\u30fc\u30c8\u304c\u30b4\u30e0\u30d7\u30ec\u30fc\u30c8\u306e\u4e0a\u3067\u50be\u304d\u3001\u30dd\u30c3\u30c8\u306b\u5bc6\u9589\u3055\u308c\u305f\u30b4\u30e0\u30d7\u30ec\u30fc\u30c8\u304c\u5909\u5f62\u3057\u3066\u56de\u8ee2\u3092\u5438\u53ce\u3057\u307e\u3059\uff08\u30aa\u30ec\u30f3\u30b8\u306e\u90e8\u6750\uff09\u3002"], "note": "\u8a2d\u8a08\u56de\u8ee2\u89d2\u306f\u3053\u306e\u56f3\u306b\u8a18\u8f09\u304c\u3042\u308a\u307e\u305b\u3093\u3002\u8868\u793a\u306e 1.0\u00b0 \u306f\u898b\u3084\u3059\u304f\u3059\u308b\u305f\u3081\u306e\u8a87\u5f35\u3067\u3001\u5b9f\u969b\u306e\u56de\u8ee2\u89d2\u306f\u3053\u308c\u3088\u308a\u5c0f\u3055\u304f\u306a\u308a\u307e\u3059\uff08\u63a8\u5b9a\uff09\u3002", "deform": "^07_RubberPlate"}], "behFocus": {"z": 120, "r": 1.5}};
 let F0 = 80, DUR = 36, F1 = 300;
 
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -5438,10 +5438,11 @@ const VIEWS = {
 };
 const liftOf = v => CFG.y0 + v * (CFG.y1 - CFG.y0);
 let camAnim = null;
-function setView(key, animate = true) {
+function setView(key, animate = true, focus = null) {
   const v = VIEWS[key];
-  const r = (CFG.r + explode * CFG.rx) * Math.max(1, 1.15 / camera.aspect) * (cutIdx ? 0.6 : 1);   // closer in on a section
-  const ty = liftOf(explode);
+  // focus = {z: Blender mm, r: m}: frame the bearing body instead of the whole model incl. long anchors (挙動 views)
+  const r = (focus ? focus.r : CFG.r + explode * CFG.rx) * Math.max(1, 1.15 / camera.aspect) * (cutIdx && !focus ? 0.6 : 1);   // closer in on a section
+  const ty = focus ? focus.z / 1000 - focus.r * 0.08 : liftOf(explode);   // a little low: the HUD covers the bottom of the stage
   const to = new THREE.Vector3(r * Math.cos(v.el) * Math.sin(v.az), ty + r * Math.sin(v.el), r * Math.cos(v.el) * Math.cos(v.az));
   const tt = new THREE.Vector3(0, ty, 0);
   if (!animate || matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -5475,8 +5476,9 @@ playBtn.addEventListener("click", () => {
   playBtn.setAttribute("aria-pressed", "true"); playBtn.textContent = "停止";
 });
 const cutBtn = document.getElementById("cut");
-cutBtn.addEventListener("click", () => {
-  cutIdx = (cutIdx + 1) % CUTS.length;
+cutBtn.addEventListener("click", () => setCut((cutIdx + 1) % CUTS.length, true));
+function setCut(i, view) {
+  cutIdx = i;
   const c = CUTS[cutIdx];
   CLIP[0].normal.set(...c.n); CLIP[0].constant = c.d;
   for (const k of caps) {
@@ -5486,9 +5488,9 @@ cutBtn.addEventListener("click", () => {
   paintBalloons();
   select(selected);
   cutBtn.textContent = c.label; cutBtn.setAttribute("aria-pressed", String(cutIdx > 0));
-  if (cutIdx === 1) setView("side"); else if (cutIdx === 2) setView("front");
+  if (view) { if (cutIdx === 1) setView("side"); else if (cutIdx === 2) setView("front"); }
   dirty = true; renderer.shadowMap.needsUpdate = true;
-});
+}
 const spinBtn = document.getElementById("spin");
 spinBtn.addEventListener("click", () => {
   controls.autoRotate = !controls.autoRotate; controls.autoRotateSpeed = 1.6;
@@ -5571,7 +5573,7 @@ const BEH = CFG.behave || [];
 const behSel = document.getElementById("beh"), behInfo = document.getElementById("behInfo"), behTxt = document.getElementById("behTxt");
 let behShow = false;   // explanation card is opt-in (YORU 2026-11-16)
 const behGroup = new THREE.Group(); scene.add(behGroup);
-let beh = null, behT0 = 0;
+let beh = null, behT0 = 0, behCut = false;
 const b2t = v => new THREE.Vector3(v[0], v[2], -v[1]).multiplyScalar(0.001);
 function labelSprite(text, color) {
   const c = document.createElement("canvas"), g = c.getContext("2d"), fs = 40, font = `700 ${fs}px "Zen Kaku Gothic New", sans-serif`;
@@ -5604,18 +5606,21 @@ function behBuild() {
 }
 // rubber parts that follow the plate above them: vertex displacement grows from 0 at the bottom face to full at the top
 const deformCache = new Map();
-function deformRubber(n, xf) {
+// sp (optional) = {axis: "x"|"y"|"z", d: [d0, d1]} (Blender axis, mm): the ramp runs along that axis instead of beh.dz
+const axVal = (ax, x, y, z) => (ax === "x" ? x : ax === "y" ? -z : y) * 1000;   // three-space -> Blender mm along ax
+function deformRubber(n, xf, sp) {
   n.obj.traverse(o => {
     if (!o.isMesh || o.userData.cap) return;
     const pos = o.geometry.attributes.position;
     if (!deformCache.has(o)) { o.geometry.computeBoundingBox(); deformCache.set(o, { a: pos.array.slice(), y0: o.geometry.boundingBox.min.y, y1: o.geometry.boundingBox.max.y }); }
     const c = deformCache.get(o), v = new THREE.Vector3(), w = new THREE.Vector3();
-    const rg = !!(xf && beh.rigid && new RegExp(beh.rigid).test(n.obj.name));
+    const rg = !sp && !!(xf && beh.rigid && new RegExp(beh.rigid).test(n.obj.name));
     for (let i = 0; i < pos.count; i++) {
       v.set(c.a[3 * i], c.a[3 * i + 1], c.a[3 * i + 2]);
       // beh.dz = [z0, z1] (Blender mm): one height ramp shared by a whole laminate; beh.rigid = steel shims that ride along undeformed
       let h = 0;
-      if (xf && beh.dz) { const yy = rg ? (c.y0 + c.y1) / 2 : v.y; h = Math.min(1, Math.max(0, ((yy + n.base.y) * 1000 - beh.dz[0]) / (beh.dz[1] - beh.dz[0]))); }
+      if (xf && sp) { const a = rg ? null : axVal(sp.axis, v.x + n.base.x, v.y + n.base.y, v.z + n.base.z); h = Math.min(1, Math.max(0, (a - sp.d[0]) / (sp.d[1] - sp.d[0]))); }
+      else if (xf && beh.dz) { const yy = rg ? (c.y0 + c.y1) / 2 : v.y; h = Math.min(1, Math.max(0, ((yy + n.base.y) * 1000 - beh.dz[0]) / (beh.dz[1] - beh.dz[0]))); }
       else if (xf) h = (v.y - c.y0) / Math.max(1e-6, c.y1 - c.y0);
       if (h > 0 && rg) { w.set(0, (c.y0 + c.y1) / 2, 0).add(n.base); const w0 = w.clone(); xf(w); w.sub(w0).multiplyScalar(h); v.add(w); pos.setXYZ(i, v.x, v.y, v.z); continue; }
       if (h > 0) { w.copy(v).add(n.base); xf(w); w.sub(n.base).sub(v).multiplyScalar(h); v.add(w); }
@@ -5637,6 +5642,7 @@ function behFrame(now) {
   for (const n of nodes) {
     if (!n.q0) n.q0 = n.obj.quaternion.clone();
     n.obj.position.copy(n.base); n.obj.quaternion.copy(n.q0);
+    if (!n.c0 && (beh.also || beh.deforms)) n.c0 = new THREE.Box3().setFromObject(n.obj).getCenter(new THREE.Vector3());
     const nm = n.obj.name, moving = (reM && reM.test(nm)) || (reR && reR.test(nm));
     if (moving) { const p = n.base.clone(); xf(p); n.obj.position.copy(p); if (rot) n.obj.quaternion.premultiply(q); }
     // steel shims inside a laminate: each one takes the share of the movement/rotation that belongs to its height,
@@ -5649,6 +5655,27 @@ function behFrame(now) {
       if (rot) p.sub(piv).applyQuaternion(qh).add(piv);
       p.addScaledVector(tr, h); n.obj.position.copy(p); n.obj.quaternion.premultiply(qh);
     } else if (beh.deform && new RegExp(beh.deform).test(nm)) deformRubber(n, xf);
+    // beh.deforms: laminates whose ramp runs along another axis (e.g. buffers standing on end); sp.rigid = parts that ride along whole
+    for (const sp of beh.deforms || []) {
+      if (sp.rigid && new RegExp(sp.rigid).test(nm)) {
+        if (!n.c0) n.c0 = new THREE.Box3().setFromObject(n.obj).getCenter(new THREE.Vector3());
+        const h = Math.min(1, Math.max(0, (axVal(sp.axis, n.c0.x, n.c0.y, n.c0.z) - sp.d[0]) / (sp.d[1] - sp.d[0])));
+        const qh = new THREE.Quaternion().slerp(q, h), p = n.base.clone();
+        if (rot) p.sub(piv).applyQuaternion(qh).add(piv);
+        p.addScaledVector(tr, h); n.obj.position.copy(p); n.obj.quaternion.copy(n.q0).premultiply(qh);
+      } else if (new RegExp(sp.re).test(nm)) deformRubber(n, xf, sp);
+    }
+    // beh.also: groups with their own motion on the same beat, e.g. rollers that travel half the stroke and roll,
+    // pinions turning with them. pivot "self" = the part's own centre.
+    for (const a of beh.also || []) {
+      if (!new RegExp(a.re).test(nm)) continue;
+      if (!n.c0) n.c0 = new THREE.Box3().setFromObject(n.obj).getCenter(new THREE.Vector3());
+      const qa = new THREE.Quaternion();
+      if (a.axis) qa.setFromAxisAngle(b2t(a.axis).normalize(), THREE.MathUtils.degToRad(a.deg) * s);
+      const pv = a.pivot === "self" || !a.pivot ? n.c0 : b2t(a.pivot);
+      const p = n.base.clone().sub(pv).applyQuaternion(qa).add(pv).add(b2t(a.t || [0, 0, 0]).multiplyScalar(s));
+      n.obj.position.copy(p); n.obj.quaternion.copy(n.q0).premultiply(qa);
+    }
     const isHit = (beh.hit || []).includes(String(n.part)), isPath = (beh.path || []).includes(String(n.part));
     n.obj.traverse(o => {
       if (!o.isMesh || o.userData.cap) return;
@@ -5662,15 +5689,19 @@ function behFrame(now) {
 }
 function setBehaviour(key) {
   if (beh && beh.deform) for (const n of nodes) if (new RegExp(beh.deform).test(n.obj.name)) deformRubber(n, null);
+  if (beh && beh.deforms) for (const sp of beh.deforms) for (const n of nodes) if (new RegExp(sp.re).test(n.obj.name)) deformRubber(n, null);
   beh = BEH.find(b => b.key === key) || null;
   behSel.value = beh ? beh.key : "";
   behInfo.hidden = !beh || !behShow; behTxt.hidden = !beh;
   if (beh) {
     stopPlay(); if (explode) setExplode(0);
     behInfo.innerHTML = `<h3>${beh.title}</h3>${beh.text.map(p => `<p>${p}</p>`).join("")}${beh.note ? `<p class="note">${beh.note}</p>` : ""}`;
-    behT0 = performance.now(); if (beh.view) setView(beh.view);
+    // beh.cut: show this mode in section (e.g. rollers hidden behind side plates); undo it when the next mode has none
+    if (beh.cut != null) { setCut(beh.cut, false); behCut = true; } else if (behCut) { setCut(0, false); behCut = false; }
+    behT0 = performance.now(); if (beh.view) setView(beh.view, true, beh.focus || CFG.behFocus || null);
   } else {
     for (const n of nodes) if (n.q0) n.obj.quaternion.copy(n.q0);
+    if (behCut) { setCut(0, false); behCut = false; }
     applyExplode(); if (selected != null) select(selected);
   }
   behBuild(); dirty = true; renderer.shadowMap.needsUpdate = true;
