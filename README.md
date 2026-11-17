@@ -1,6 +1,6 @@
-# 支承・伸縮装置 3Dモデル集
+# 橋梁部材 3Dモデル集
 
-支承・伸縮装置の3Dビューア（ブラウザで動く単体HTML）。公開URL: https://y-uematsu0615.github.io/shisho-3d/
+橋梁部材（支承・伸縮装置）の3Dビューア（ブラウザで動く単体HTML）。公開URL: https://y-uematsu0615.github.io/shisho-3d/
 
 - `index.html` 入口ページ（「全モデルをオフライン保存」ボタン付き）
 - 実寸図面モデル：`BPB-400M` `BPB-400F` `RB-500F` `RB-430M`（日本支承協会 標準設計図の寸法）
