@@ -5303,7 +5303,8 @@ if (matchMedia("(pointer: coarse)").matches) document.querySelector(".hint").tex
 const setHdr = () => document.documentElement.style.setProperty("--hdr", document.querySelector("header").offsetHeight + "px");
 setHdr(); addEventListener("resize", setHdr);
 const canvas = document.getElementById("c");
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+let LITE0 = false; try { LITE0 = localStorage.getItem("bbaLite") === "1"; } catch (e) {}
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: !LITE0, alpha: true });   // MSAA is costly without a GPU
 // PCs (often no GPU) are capped at 1.5; phones/tablets have 2-3x screens and a GPU, so render at up to 2x there
 renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia("(pointer: coarse)").matches ? 2 : 1.5));
 renderer.outputEncoding = THREE.sRGBEncoding;
@@ -5397,11 +5398,16 @@ new THREE.GLTFLoader().parse(glbBuffer(), "", gltf => {
   const stencilMat = (side, op) => new THREE.MeshBasicMaterial({ side, clippingPlanes: CLIP, depthWrite: false, depthTest: false, colorWrite: false,
     stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilFail: op, stencilZFail: op, stencilZPass: op });
   const sBack = stencilMat(THREE.BackSide, THREE.IncrementWrapStencilOp), sFront = stencilMat(THREE.FrontSide, THREE.DecrementWrapStencilOp);
-  const quad = new THREE.PlaneGeometry(6, 6);
+  // cap quads only as large as the model (they are drawn once per mesh, so their area is the cost on slow PCs)
+  const mb = new THREE.Box3(); for (const n of nodes) mb.expandByObject(n.obj);
+  const qs = Math.min(6, mb.getSize(new THREE.Vector3()).length() * 1.3 + 0.2);
+  const quad = new THREE.PlaneGeometry(qs, qs);
   const meshes = []; for (const n of nodes) n.obj.traverse(o => { if (o.isMesh && !o.userData.cap) meshes.push([n, o]); });
   meshes.forEach(([n, o], i) => {
-    for (const m of [sBack, sFront]) { const t = new THREE.Mesh(o.geometry, m); t.userData.cap = true; t.visible = false; t.renderOrder = i + 1; o.add(t); caps.push(t); }
-    const c = new THREE.Mesh(quad, capMaterial(n.part, o.material)); c.userData.cap = true; c.userData.quad = true; c.visible = false; c.renderOrder = i + 1.5;
+    // rest-pose box, grown by 60 mm so parts that move in 挙動/分解 near the plane still get their cap
+    const box = new THREE.Box3().setFromObject(o).expandByScalar(0.06);
+    for (const m of [sBack, sFront]) { const t = new THREE.Mesh(o.geometry, m); t.userData.cap = true; t.userData.box = box; t.visible = false; t.renderOrder = i + 1; o.add(t); caps.push(t); }
+    const c = new THREE.Mesh(quad, capMaterial(n.part, o.material)); c.userData.cap = true; c.userData.quad = true; c.userData.box = box; c.visible = false; c.renderOrder = i + 1.5;
     c.onAfterRender = r => r.clearStencil();
     scene.add(c); caps.push(c);
     o.material.clippingPlanes = CLIP;
@@ -5409,6 +5415,7 @@ new THREE.GLTFLoader().parse(glbBuffer(), "", gltf => {
   scene.add(root);
   document.getElementById("loading").hidden = true;
   resize(); setView("iso", false); select(CFG.first); applyExplode();
+  if (LITE0) setLite();
 }, () => { document.getElementById("loading").textContent = "モデルを読み込めませんでした。ページを再読み込みしてください。"; });
 
 const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -5482,7 +5489,7 @@ function setCut(i, view) {
   const c = CUTS[cutIdx];
   CLIP[0].normal.set(...c.n); CLIP[0].constant = c.d;
   for (const k of caps) {
-    k.visible = cutIdx > 0;
+    k.visible = cutIdx > 0 && (!k.userData.box || k.userData.box.intersectsPlane(CLIP[0]));   // skip parts the plane misses
     if (k.userData.quad) { k.position.copy(CLIP[0].normal).multiplyScalar(-CLIP[0].constant); k.lookAt(k.position.clone().add(CLIP[0].normal)); }
   }
   paintBalloons();
@@ -5715,6 +5722,27 @@ if (BEH.length) {
   playBtn.addEventListener("click", () => { if (beh) setBehaviour(""); });
 }
 
+// 軽量表示 (YORU 2026-11-17 「重すぎてかくかく」): on a PC without a GPU, PBR + soft shadows draw ~9x slower than
+// Lambert without shadows (measured with software GL: 1180 ms vs 133 ms a frame). While the view keeps moving, the
+// interval between consecutive frames is watched; if it stays above 45 ms, switch once to the light look and
+// remember it on this device.
+let lite = false, lastR = 0, renderedPrev = false, slowRun = 0;
+function setLite() {
+  if (lite) return; lite = true;
+  try { localStorage.setItem("bbaLite", "1"); } catch (e) {}
+  renderer.shadowMap.enabled = false; ground.visible = false;
+  renderer.setPixelRatio(1); resize(true);
+  scene.environment = null; renderer.toneMappingExposure = 1.0;
+  scene.add(new THREE.HemisphereLight(0xf4f6f8, 0x4a5058, 1.5)); sun.intensity = 2.2;
+  for (const n of nodes) n.obj.traverse(o => {
+    if (!o.isMesh || o.userData.cap || !o.material.isMeshStandardMaterial) return;
+    const m = o.material;
+    // metals look dark under PBR (they mirror a grey room); without reflections they must be darkened to match
+    o.material = new THREE.MeshLambertMaterial({ color: m.color.clone().multiplyScalar(1 - 0.6 * (m.metalness || 0)), map: m.map, side: m.side, clippingPlanes: m.clippingPlanes,
+      emissive: m.emissive.clone(), emissiveIntensity: m.emissiveIntensity, transparent: m.transparent, opacity: m.opacity, depthWrite: m.depthWrite });
+  });
+  dirty = true;
+}
 function tick(now) {
   resize();
   if (beh) behFrame(now);
@@ -5732,7 +5760,11 @@ function tick(now) {
     if (t >= 1) camAnim = null;
   }
   if (controls.update()) dirty = true;
-  if (dirty) { renderer.render(scene, camera); dirty = false; }
+  if (dirty) {
+    renderer.render(scene, camera); dirty = false;
+    if (!lite && renderedPrev) { slowRun = now - lastR > 45 ? slowRun + 1 : 0; if (slowRun >= 8) setLite(); }
+    lastR = now; renderedPrev = true;
+  } else renderedPrev = false;
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
