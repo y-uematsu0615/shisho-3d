@@ -156,6 +156,7 @@ li[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 16%, tra
           <button id="vIso" type="button">斜め</button>
           <button id="play" type="button" aria-pressed="false">分解を再生</button>
           <button id="spin" type="button" aria-pressed="false">自動回転</button>
+          <button id="xray" type="button" aria-pressed="false" title="サポートボックス・コントロールボックス・後打ちコンクリートを半透明にして、中のスプリングやベアリングを見せます">ボックス透過</button>
         </div>
       </div>
     </div>
@@ -5515,6 +5516,12 @@ function deformOf(name) {
     return { spring: true, s: "S" + (m[1] - 1), b: m[2], zp: ZTOP, w: (x, y, z) => clamp01((z - ZTOP) / 37) };
   if ((m = name.match(/^08_Bearing_Frame_S(\d)_B(\d)/)))  // polyamide: top on the beam flange, bottom follows the support beam's top face
     return { spring: true, s: "S" + (m[1] - 1), b: "B" + m[2], zp: ZTOP, w: (x, y, z) => clamp01((z - ZTOP) / 31) };
+  // urethane guide shoes: the face against the support beam's web stays on the web when the beam skews in plan
+  // (橋軸直角), the back stays on its guide (frame guide on beam j, or box guide on the end beam)
+  if ((m = name.match(/^09_Shoe_(?:Box_)?S(\d)_(B\d|E\d)_([LR])/))) {
+    const xs = XS[m[1] - 1], sx = m[3] === "L" ? -1 : 1, face = xs + sx * 9;   // web is 18 mm thick
+    return { spring: true, ax: 0, s: "S" + (m[1] - 1), b: m[2], zp: face, w: x => clamp01(sx * (x - face) / 32) };
+  }
   if ((m = name.match(/^06_Spring_Frame_S(\d)_B(\d)/)))   // bottom on the frame, top pressed up against the support beam
     return { spring: true, s: "S" + (m[1] - 1), b: "B" + m[2], zp: ZBOT, w: (x, y, z) => clamp01((ZBOT - z) / 42) };
   return null;
@@ -5580,16 +5587,17 @@ function solve() {
   }
 }
 const _p0 = new THREE.Vector3(), _n = new THREE.Vector3(), _up = new THREE.Vector3();
-function deformSpring(n) {   // each column of the spring is stretched or squeezed onto the beam's face (top or bottom)
-  const E = BODY[n.def.b], S = BODY[n.def.s], zt = n.def.zp * 0.001;
-  _p0.set(S.elements[12], S.elements[13], S.elements[14]).add(_a.set(0, zt, 0).applyQuaternion(BQ[n.def.s]));   // a point on the beam's top face
-  _n.set(0, 1, 0).applyQuaternion(BQ[n.def.s]); _up.set(0, 1, 0).applyQuaternion(BQ[n.def.b]);
+function deformSpring(n) {   // each column of the part is stretched or squeezed onto a face of the support beam
+  // ax: 1 = the beam's top/bottom face (springs, frame bearing), 0 = a side face of its web (guide shoes)
+  const E = BODY[n.def.b], S = BODY[n.def.s], ax = n.def.ax === 0 ? 0 : 1, zt = n.def.zp * 0.001;
+  _p0.set(S.elements[12], S.elements[13], S.elements[14]).add(_a.set(0, 0, 0).setComponent(ax, zt).applyQuaternion(BQ[n.def.s]));   // a point on that face
+  _n.set(0, 0, 0).setComponent(ax, 1).applyQuaternion(BQ[n.def.s]); _up.set(0, 0, 0).setComponent(ax, 1).applyQuaternion(BQ[n.def.b]);
   const un = _up.dot(_n);
   for (const d of n.def.meshes) {
     const W = d.W, w = d.w, P = d.attr.array;
     for (let i = 0, k = 0; i < w.length; i++, k += 3) {
       _a.set(W[k], W[k + 1], W[k + 2]).applyMatrix4(E);
-      _b.set(W[k], zt, W[k + 2]).applyMatrix4(E);
+      _b.set(W[k], W[k + 1], W[k + 2]).setComponent(ax, zt).applyMatrix4(E);
       const dl = (_p0.dot(_n) - _b.dot(_n)) / un * (1 - w[i]);
       P[k] = _a.x + _up.x * dl; P[k + 1] = _a.y + _up.y * dl; P[k + 2] = _a.z + _up.z * dl;
     }
@@ -5785,6 +5793,7 @@ function setQuality(on) {
   hemi.visible = !on;
   scene.traverse(o => { if (o.material) o.material.needsUpdate = true; });
   if (selected !== null) select(selected);
+  if (typeof applyXray === "function") applyXray();
   renderer.shadowMap.needsUpdate = true; dirty = true;
 }
 const modeBtns = [...document.querySelectorAll("#modes button")], mcap = document.getElementById("mcap"), exag = document.getElementById("exag");
@@ -5801,6 +5810,26 @@ function updExag() {
   exag.hidden = !on; exag.textContent = on ? `変位を ${mag} 倍に拡大して表示中（橋軸の伸縮は実寸）` : "";
 }
 for (const b of modeBtns) b.addEventListener("click", () => setMode(b.dataset.m));
+// see-through: boxes and post-cast concrete become glassy so the springs and bearings inside can be watched moving
+let xray = false;
+const XRAY = [[/^(SB_|CB_)/, 0.22], [/^C_PostCast/, 0.10]];
+function applyXray() {
+  for (const n of nodes) {
+    const hit = XRAY.find(([re]) => re.test(n.obj.name));
+    if (!hit || (ghost && n.part !== selected)) continue;   // already faded by "この部品の場所を表示"
+    n.obj.traverse(o => {
+      if (!o.isMesh) return;
+      o.material.transparent = xray; o.material.opacity = xray ? hit[1] : 1; o.material.depthWrite = !xray;
+      o.renderOrder = xray ? 1 : 0;
+      o.material.needsUpdate = true;
+    });
+  }
+  dirty = true;
+}
+{ const f = window.select; window.select = function () { const r = f.apply(this, arguments); applyXray(); return r; }; }
+const xrayBtn = document.getElementById("xray");
+xrayBtn.addEventListener("click", () => { xray = !xray; xrayBtn.setAttribute("aria-pressed", String(xray)); applyXray(); });
+
 document.getElementById("mag").addEventListener("change", e => { mag = +e.target.value; updExag(); applyExplode(); });
 function tick(now) {
   resize();
