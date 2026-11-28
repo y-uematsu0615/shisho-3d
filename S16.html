@@ -5769,6 +5769,9 @@ function tick(now) {
 }
 requestAnimationFrame(tick);
 </script>
+<!--viewer-fix-->
+<script>(()=>{try{controls.addEventListener("change",()=>{dirty=true;});}catch(e){}})();</script>
+<!--/viewer-fix-->
 <!--site-nav-->
 <style>.site-home{font:500 13px/1 var(--font-ui,sans-serif);color:var(--accent,#1f6fb2);text-decoration:none;border:1.5px solid currentColor;border-radius:4px;padding:6px 10px;align-self:center;white-space:nowrap;background:var(--panel,#fff)}
 .site-home.float{position:fixed;z-index:50;top:max(6px,env(safe-area-inset-top,0px));left:max(6px,env(safe-area-inset-left,0px));opacity:.94}</style>

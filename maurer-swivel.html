@@ -62,6 +62,12 @@ button {
 button:hover { border-color: var(--accent); }
 button[aria-pressed="true"] { background: var(--accent); color: var(--panel); border-color: var(--accent); }
 button:focus-visible, input:focus-visible, li:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.motion { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 12px; }
+.motion > b { font-size: 13px; }
+.motion .modes { display: flex; flex-wrap: wrap; gap: 4px; }
+.motion select { font: inherit; font-size: 12px; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 4px 6px; }
+.motion .cap { flex: 1 1 100%; color: var(--muted); line-height: 1.5; }
+.exag { position: absolute; top: 34px; left: 12px; font-size: 12px; font-weight: 700; color: #b3261e; background: color-mix(in srgb, var(--panel) 85%, transparent); border: 1px solid #b3261e; border-radius: 4px; padding: 2px 8px; }
 .hint { position: absolute; top: 10px; left: 12px; font-size: 12px; color: var(--muted); }
 
 aside { min-height: 0; overflow-y: auto; background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; }
@@ -106,6 +112,49 @@ li[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 16%, tra
 .vid video { width: 100%; height: 100%; max-width: 100%; object-fit: contain; background: #000; display: block; }
 .vid .vid-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 12px; background: var(--panel); border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
 .vid button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 4px; padding: 5px 12px; }
+
+/* ---- phones (YORU 2026-11-28: on iPhone the controls covered 80% of the model) ---- */
+.hud-toggle { display: none; }
+@media (pointer: coarse) {
+  button, .motion select { min-height: 36px; font-size: 13px; }
+  input[type=range] { height: 28px; }
+}
+@media (max-width: 760px) {
+  header { padding-block: 6px; gap: 2px 10px; }
+  h1 { font-size: 14px; }
+  .spec { font-size: 11px; gap: 0 10px; }
+  .test-badge { font-size: 11px; }
+  .stage { height: calc(100svh - var(--hdr, 64px)); min-height: 360px; }
+  .hud { left: 6px; right: 6px; bottom: max(6px, env(safe-area-inset-bottom, 0px)); padding: 6px 8px; gap: 4px 8px; max-height: 42%; overflow-y: auto; }
+  .hud.closed { display: none; }
+  .motion { gap: 4px 6px; }
+  .motion > b { display: none; }
+  .motion .modes, .views { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; flex: 1 1 100%; min-width: 0; }
+  .motion .modes::-webkit-scrollbar, .views::-webkit-scrollbar { display: none; }
+  .motion .modes button, .views button { flex: none; }
+  .motion .cap { font-size: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .slider { flex: 1 1 140px; gap: 6px; }
+  .slider label { font-size: 12px; }
+  .slider output { width: 3.6em; font-size: 11px; white-space: nowrap; }
+  .exag { top: 6px; left: 6px; font-size: 11px; }
+  .hud-toggle { display: block; position: absolute; right: 6px; top: 6px; z-index: 5; font-size: 12px; min-height: 32px; padding: 4px 10px;
+    background: color-mix(in srgb, var(--panel) 90%, transparent); }
+}
+/* phone held sideways: no header, the model gets the whole screen */
+@media (orientation: landscape) and (max-height: 520px) {
+  .app { height: auto; }
+  header { display: none; }
+  main { grid-template-columns: 1fr; }
+  .stage { height: 100svh; min-height: 0; }
+  .hint { display: none; }
+  .hud { left: max(6px, env(safe-area-inset-left, 0px)); right: max(6px, env(safe-area-inset-right, 0px)); bottom: 6px; padding: 6px 8px; gap: 4px 8px; max-height: 48%; overflow-y: auto; }
+  .hud.closed { display: none; }
+  .motion .cap, .motion > b { display: none; }
+  .motion .modes, .views { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+  .motion .modes button, .views button { flex: none; }
+  .hud-toggle { display: block; position: absolute; right: 6px; top: 6px; z-index: 5; font-size: 12px; padding: 4px 10px; }
+  aside { border-left: 0; border-top: 1px solid var(--line); }
+}
 </style>
 
 </head>
@@ -123,7 +172,24 @@ li[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 16%, tra
       <canvas id="c" tabindex="0" aria-label="マウラースイベルジョイント（日本鋳造 ES-320）の3Dモデル。ドラッグで回転、ホイールまたはピンチで拡大縮小"></canvas>
       <div class="loading" id="loading">モデルを読み込んでいます…</div>
       <div class="hint">ドラッグで回転・右ドラッグで移動・ホイールで拡大 ／ 部品をクリックで詳細</div>
+      <div class="exag" id="exag" hidden></div>
+      <button type="button" class="hud-toggle" id="hudToggle" aria-expanded="true" aria-controls="hud">操作を隠す</button>
       <div class="hud">
+        <div class="motion" role="group" aria-label="動き">
+          <b>動き</b>
+          <div class="modes" id="modes">
+            <button type="button" data-m="X">橋軸（伸縮）</button>
+            <button type="button" data-m="Y">橋軸直角</button>
+            <button type="button" data-m="Z">鉛直</button>
+            <button type="button" data-m="XY">橋軸＋直角</button>
+            <button type="button" data-m="RX">X軸まわり</button>
+            <button type="button" data-m="RY">Y軸まわり</button>
+            <button type="button" data-m="RZ">Z軸まわり</button>
+            <button type="button" data-m="" aria-pressed="true">停止</button>
+          </div>
+          <label>表示倍率 <select id="mag"><option value="1">実寸</option><option value="2">×2</option><option value="5" selected>×5</option><option value="10">×10</option><option value="20">×20</option></select></label>
+          <div class="cap" id="mcap">ボタンを押すと、その方向の動きを繰り返し再生します。橋軸以外は動きが小さいため、倍率を上げて表示しています。</div>
+        </div>
         <div class="slider">
           <label for="explode">分解</label>
           <input id="explode" type="range" min="0" max="1000" value="0" step="1">
@@ -142,6 +208,7 @@ li[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 16%, tra
           <button id="vIso" type="button">斜め</button>
           <button id="play" type="button" aria-pressed="false">分解を再生</button>
           <button id="spin" type="button" aria-pressed="false">自動回転</button>
+          <button id="xray" type="button" aria-pressed="false" title="ボックスを半透明にして、中のベアリングやサポートビームの動きを見せます">ボックス透過</button>
         </div>
       </div>
     </div>
@@ -149,7 +216,7 @@ li[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 16%, tra
       <div class="detail" id="detail"></div>
       <div class="sched-head">材料表（部品をクリックで選択）</div>
       <ul id="list" role="listbox" aria-label="部品"></ul>
-      <div class="foot">寸法は日本鋳造カタログ（標準寸法表・断面図）と川金コアテック「モジュラータイプ別構造詳細」のマウラースイベルジョイント断面図・平面図による。部品名はカタログの表記。遊間スライダーは1セル当たりの遊間 a を動かし、中立時は a = 40 mm。遊間を変えるとサポートビームはコンクリート側の端のベアリングを通る線上で旋回し、各ミドルビームとの交点は等間隔のまま動く（カタログ 伸縮メカニズム図-1）。図面に寸法のない部分（ベアリングの厚さ、ボックス内部、アンカー類）は図から読み取った推定。</div>
+      <div class="foot">寸法は日本鋳造カタログ（標準寸法表・断面図）と川金コアテック「モジュラータイプ別構造詳細」のマウラースイベルジョイント断面図・平面図による。部品名はカタログの表記。遊間スライダーは1セル当たりの遊間 a を動かし、中立時は a = 40 mm。「動き」は旧マゲバ3DCGと同じ7方向を小さい量で再現したもの。鋼桁側（E2）だけを動かし、サポートビーム・ミドルビーム・ゴム・ベアリングの位置はつながりから計算している。橋軸以外は表示倍率で拡大し、拡大で生じるずれはゴム・ベアリング類の変形で受けている。遊間を変えるとサポートビームはコンクリート側の端のベアリングを通る線上で旋回し、各ミドルビームとの交点は等間隔のまま動く（カタログ 伸縮メカニズム図-1）。図面に寸法のない部分（ベアリングの厚さ、ボックス内部、アンカー類）は図から読み取った推定。</div>
     </aside>
   </main>
 </div>
@@ -5281,24 +5348,23 @@ let F0 = 90, DUR = 45, F1 = 365;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const canvas = document.getElementById("c");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));   // 2x costs ~1.8x the pixels for little visible gain
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1));     // light mode: no GPU on the presenter's PC
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.8;
 renderer.physicallyCorrectLights = true;
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = false;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.shadowMap.autoUpdate = false;   // the sun is fixed, so shadows only change when parts move
 // render on demand: draw a frame only when something on screen can have changed
 let dirty = true;
 
 const scene = new THREE.Scene();
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;  // image-based lighting
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f96, 2.2));   // light mode: Lambert + sky light instead of reflections
 
 const sun = new THREE.DirectionalLight(0xffffff, 1.1);
 sun.position.set(1.6, 3.2, 1.8);
-sun.castShadow = true;
+sun.castShadow = false;
 sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -3, right: 3, top: 3, bottom: -3, near: 0.1, far: 12 });
 sun.shadow.bias = -0.0004;
@@ -5307,7 +5373,7 @@ const ground = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMat
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -0.9;
 ground.receiveShadow = true;
-scene.add(ground);
+// no ground shadow in light mode
 
 const camera = new THREE.PerspectiveCamera(32, 1, 0.01, 50);
 const controls = new THREE.OrbitControls(camera, canvas);
@@ -5332,24 +5398,22 @@ new THREE.GLTFLoader().parse(glbBuffer(), "", gltf => {
   const root = gltf.scene;
   root.traverse(o => {
     if (!o.isMesh) return;
-    o.castShadow = o.receiveShadow = true;
-    o.material = o.material.clone();           // per-part emissive highlight
-    o.material.envMapIntensity = 0.55;
+    // plain Lambert shading (no reflections) is several times cheaper per pixel than the PBR material
+    const c = o.material.color.clone(), mt = o.material.metalness || 0;
+    if (mt >= 0.5 && c.r > 0.9) c.set(0x8f959b);                  // procedural steel exported as plain white: steel grey
+    c.lerp(new THREE.Color(0x9aa0a6), mt * 0.45);
+    if (c.r + c.g + c.b < 0.25) c.lerp(new THREE.Color(0x2e3338), 0.6);   // black paint / rubber: dark grey, so the shape still reads
+    o.material = new THREE.MeshLambertMaterial({ color: c });   // one per part: emissive highlight
   });
   if (root.userData && root.userData.explode_end) F1 = +root.userData.explode_end;
   if (gltf.scenes && gltf.scenes[0] && gltf.scenes[0].userData.explode_end) F1 = +gltf.scenes[0].userData.explode_end;
   root.children.forEach(o => {
     const ud = o.userData || {};
     const stages = JSON.parse(ud.stages || "[]").map(([st, v]) => ({ st, off: new THREE.Vector3(v[0], v[2], -v[1]).multiplyScalar(0.001) }));
-    const c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3());
-    const yc = -c.z * 1000;                                    // back to Blender y, mm
-    const jv = JSON.parse(ud.j || "2");
-    const stretch = jv === "seal";
-    // a seal spans beams j-1..j (cells 130 apart, centres -195 .. 195)
-    const j = stretch ? Math.floor((yc + 260) / 130) + 1 : +jv;
-    nodes.push({ obj: o, part: +ud.part, base: o.position.clone(), stages,
-                 j, stretch, pivot: c.clone(), baseScale: o.scale.clone(),
-                 swivel: ud.swivel ? JSON.parse(ud.swivel) : null, baseRot: o.rotation.y });
+    const def = deformOf(o.name);
+    if (def) prepDeform(o, def);
+    nodes.push({ obj: o, part: +ud.part, base: o.position.clone(), baseQuat: o.quaternion.clone(), stages,
+                 def, body: bodyOf(o.name) });
   });
   scene.add(root);
   document.getElementById("loading").hidden = true;
@@ -5364,33 +5428,221 @@ new THREE.GLTFLoader().parse(glbBuffer(), "", gltf => {
 const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 let explode = 0;
 let gap = 40;
+const TYPE = "ES";
+// ---------- linkage kinematics (Maurer E-320 / ES-320) ----------
+// E1 (concrete side) is fixed and E2 (girder side) gets one rigid displacement; every other part is solved from it.
+//  E  : middle beam k + its two welded support beams = ONE rigid body. Its ends lie between the upper and lower
+//       bearings under E1 and E2, so its height and slope follow the line between the bearings; in plan it takes
+//       k/4 of E2's movement (control rubbers keep the cells equal).
+//  ES : each support beam = rigid bar through the end bearings of E1 and E2 (swivels and tilts). Middle beam k sits
+//       on both support beams at k/4 of the way from E1 to E2, so the gaps stay equal (catalogue mechanism figure).
+// Rubbers, seals, bearings and springs (化成品) are deformed vertex by vertex; steel parts never deform.
+// The display factor multiplies the E2 displacement only (never the bridge-axis gap), then the linkage is solved.
+// three.js axes: x = along the joint, y = up, z = -(bridge axis). V() takes drawing coordinates in mm.
+const V = (x, yb, zb) => new THREE.Vector3(x * 0.001, zb * 0.001, -yb * 0.001);
+const XU = [-650, 650], YBEAM = { 1: -130, 2: 0, 3: 130 };
+const E_XSB = { 1: -110, 2: 0, 3: 110 }, E_Y1 = -282.5, E_Y2 = 300, E_ZC = -193;   // E: bearing centre lines, beam centre height
+const ES_DX = 143, ES_Y = 260, ES_ZC = -237;                                        // ES: end bearings at (xu ± m·143, ∓260)
+const MODES = TYPE === "E" ? {
+  X:  { mag: 1, view: "side", gap: 30,
+        cap: "橋軸方向の伸縮。各セルのすき間が 10〜70 mm の間で等しく変わります（カタログでは 1 セル 0〜80 mm）。サポートビームはミドルビームと一体で、両側のベアリングの間をすべります。コントロールゴムが伸び縮みして間隔をそろえます。実寸表示です。" },
+  Y:  { mag: 2, view: "bottom", t: [0.005, 0, 0],
+        cap: "橋軸直角方向。E 型はサポートビームがボックスの窓を通るので、直角方向の動きはわずかです。ミドルビームは 1/4 ずつ横にずれ、ベアリングの上をすべります。表示は ±5 mm の場合です（設計値は資料になく、窓のすき間からの推定）。" },
+  Z:  { mag: 5, view: "side", t: [0, 0.010, 0],
+        cap: "鉛直方向の段差。サポートビームが両側のベアリングに挟まれたまま傾き、ミドルビームは位置に応じて段差を分け合います。E 型はミドルビームとサポートビームが一体なので、ミドルビームも一緒に少し傾き、上面のすき間がわずかに変わります。表示は ±10 mm の場合です。" },
+  XY: { mag: 2, view: "bottom", gap: 30, t: [0.005, 0, 0],
+        cap: "橋軸と橋軸直角の複合。橋軸は 10〜70 mm の伸縮（実寸）、直角方向は ±5 mm です。" },
+  RX: { mag: 5, view: "front", axis: [0, 0, 1], ang: 0.005, piv: [0, -0.2, 0],
+        cap: "橋軸まわりの回転（ねじれ）。E 型は 1 本のミドルビームと 2 本のサポートビームが一体なので、ねじれはベアリングの変形で受けます。表示は 5/1000 rad の場合です。" },
+  RY: { mag: 5, view: "side", axis: [1, 0, 0], ang: 0.005, piv: [0, -1.5, -0.6],
+        cap: "橋軸直角まわりの回転（けた端の回転）。鋼桁側が傾き、サポートビームがベアリングの間で傾いて追従します。表示は 5/1000 rad の場合です（回転中心は支承付近と仮定）。" },
+  RZ: { mag: 10, view: "bottom", axis: [0, 1, 0], ang: 0.002, piv: [0, 0, 0],
+        cap: "鉛直軸まわりの回転（平面内）。片側のすき間が開き、反対側が閉じます（扇形）。表示は 2/1000 rad の場合です。" },
+} : {
+  X:  { mag: 1, view: "bottom", gap: 30,
+        cap: "橋軸方向の伸縮。サポートビームがコンクリート側の端のベアリングを中心に旋回し、ミドルビームとの交点が等間隔に動くので、各セルのすき間が 10〜70 mm の間で等しく変わります（カタログでは 1 セル 0〜80 mm）。実寸表示です。" },
+  Y:  { mag: 5, view: "bottom", t: [0.010, 0, 0],
+        cap: "橋軸直角方向。サポートビームが平面的に向きを変え、ミドルビームは交点に引かれて 1/4 ずつ横にずれます。スイベル型は全方向に動けます。表示は ±10 mm の場合です（直角方向の設計値は資料で未確認）。" },
+  Z:  { mag: 5, view: "side", t: [0, 0.010, 0],
+        cap: "鉛直方向の段差。サポートビームが両端のベアリングに乗ったまま傾き、ミドルビームはその上に乗って段差を分け合います。表示は ±10 mm の場合です。" },
+  XY: { mag: 5, view: "bottom", gap: 30, t: [0.010, 0, 0],
+        cap: "橋軸と橋軸直角の複合。橋軸は 10〜70 mm の伸縮（実寸）、直角方向は ±10 mm です。" },
+  RX: { mag: 10, view: "front", axis: [0, 0, 1], ang: 0.005, piv: [0, -0.2, 0],
+        cap: "橋軸まわりの回転（ねじれ）。左右のサポートビームが逆向きに傾き、ミドルビームが少しずつ傾いてつなぎます。表示は 5/1000 rad の場合です。" },
+  RY: { mag: 5, view: "side", axis: [1, 0, 0], ang: 0.005, piv: [0, -1.5, -0.6],
+        cap: "橋軸直角まわりの回転（けた端の回転）。鋼桁側が傾き、サポートビームがそれをつなぎます。表示は 5/1000 rad の場合です（回転中心は支承付近と仮定）。" },
+  RZ: { mag: 20, view: "bottom", axis: [0, 1, 0], ang: 0.002, piv: [0, 0, 0],
+        cap: "鉛直軸まわりの回転（平面内）。片側のすき間が開き、反対側が閉じます（扇形）。サポートビームはそれぞれ旋回して追従します。表示は 2/1000 rad の場合です。" },
+};
+let mode = "", mPhase = 0, mStart = 0, mag = 5, lastMotion = 0;
+const BODY = {}, BQ = {};
+for (const k of ["E1", "E2", "B1", "B2", "B3", "S0", "S1", "H01", "H12", "H23"]) { BODY[k] = new THREE.Matrix4(); BQ[k] = new THREE.Quaternion(); }
+function bodyOf(name) {
+  let m;
+  if ((m = name.match(/^08_ControlRubber_U\d_([abc])_Pin/))) return { a: "H01", b: "H12", c: "H23" }[m[1]];   // steel pin: rigid, halfway
+  if ((m = name.match(/^0[48]_(?:SupportBeam|Stainless)_U(\d)/))) return "S" + (m[1] - 1);                  // ES support beam
+  if ((m = name.match(/_B(\d)/))) return "B" + m[1];
+  if ((m = name.match(/_E(\d)/))) return "E" + m[1];
+  return "E1";
+}
+const clamp01 = v => Math.max(0, Math.min(1, v));
+// parts that deform: { a, b, w } blends two bodies per vertex; { spring, s, b, zp, w } presses a face onto a support beam face
+function deformOf(name) {
+  let m;
+  if ((m = name.match(/^03_Seal(\d)/))) {                   // seal n: bulb in beam n-1's groove (w 0) to bulb in beam n's (w 1)
+    const n = +m[1], gc = -195 + 130 * (n - 1);
+    return { a: n === 1 ? "E1" : "B" + (n - 1), b: n === 4 ? "E2" : "B" + n, w: (x, y) => clamp01((y - (gc - 19)) / 38) };
+  }
+  if ((m = name.match(/^08_ControlRubber_U\d_([abc])$/))) { // 発泡ウレタン between the brackets of two support beams (a: box seat)
+    const R = { a: ["B1", "E1", -327, 71], b: ["B1", "B2", -122, 93], c: ["B2", "B3", 9, 91] }[m[1]];
+    return { a: R[0], b: R[1], w: (x, y) => clamp01((y - R[2]) / R[3]) };
+  }
+  if (TYPE === "E") {
+    if ((m = name.match(/^05_UpperBearing_U\d_S(\d)_(E\d)/)))   // top in the box, PTFE face pressed onto the beam's top
+      return { spring: true, s: "B" + m[1], b: m[2], zp: -140, w: (x, y, z) => clamp01((z + 140) / 33) };
+    if ((m = name.match(/^06_LowerBearing_U\d_S(\d)_(E\d)/)))   // base on the box bottom, PTFE face under the beam
+      return { spring: true, s: "B" + m[1], b: m[2], zp: -246, w: (x, y, z) => clamp01((-246 - z) / 25) };
+  } else {
+    let s;
+    if ((m = name.match(/^05_Bearing_End_U(\d)_([NP])/)))       // under the beam end, on the box bottom
+      return { spring: true, s: "S" + (m[1] - 1), b: m[2] === "N" ? "E1" : "E2", zp: -286, w: (x, y, z) => clamp01((-286 - z) / 49) };
+    if ((m = name.match(/^06_Spring_End_U(\d)_([NP])/)))        // over the beam end, under the box top
+      return { spring: true, s: "S" + (m[1] - 1), b: m[2] === "N" ? "E1" : "E2", zp: -188, w: (x, y, z) => clamp01((z + 188) / 48) };
+    if ((m = name.match(/^05_Bearing_Mid_U(\d)_B(\d)/)))        // between the middle beam flange and the beam top
+      return { spring: true, s: "S" + (m[1] - 1), b: "B" + m[2], zp: -188, w: (x, y, z) => clamp01((z + 188) / 38) };
+    if ((m = name.match(/^06_Spring_Mid_U(\d)_B(\d)/)))         // on the swivel plate, pressed up under the beam
+      return { spring: true, s: "S" + (m[1] - 1), b: "B" + m[2], zp: -286, w: (x, y, z) => clamp01((-286 - z) / 54) };
+  }
+  return null;
+}
+const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3();
+const AX = new THREE.Vector3(1, 0, 0), UP = new THREE.Vector3(0, 1, 0), BR = new THREE.Vector3(0, 0, -1);
+const _B0 = new THREE.Matrix4(), _B1 = new THREE.Matrix4();
+function frame(out, q, a0, b0, a1, b1, c0, c1) {   // rigid: (a0, b0) -> (a1, b1), point c0 -> c1
+  _B0.makeBasis(a0, b0, _c.crossVectors(a0, b0).normalize()).transpose();
+  _B1.makeBasis(a1, b1, _c.crossVectors(a1, b1).normalize());
+  out.multiplyMatrices(_B1, _B0); q.setFromRotationMatrix(out);
+  const t = c0.clone().applyMatrix4(out);
+  out.setPosition(c1.x - t.x, c1.y - t.y, c1.z - t.z);
+}
+const mid = (p, q) => p.clone().add(q).multiplyScalar(0.5);
+function halfBody(k, a, b) {   // rigid pose halfway between two bodies (for the control-rubber pins)
+  const pa = new THREE.Vector3().setFromMatrixPosition(BODY[a]), pb = new THREE.Vector3().setFromMatrixPosition(BODY[b]);
+  BQ[k].copy(BQ[a]).slerp(BQ[b], 0.5);
+  BODY[k].makeRotationFromQuaternion(BQ[k]).setPosition(pa.lerp(pb, 0.5));
+}
+function solve() {
+  // E2: bridge-axis opening (real size) + the selected motion (times the display factor)
+  const E2 = BODY.E2.makeTranslation(0, 0, -(gap - 40) * 4 * 0.001), M = MODES[mode];
+  if (M && (M.axis || M.t)) {
+    const k = mag * mPhase, T = new THREE.Matrix4();
+    if (M.axis) {
+      const p = new THREE.Vector3(...M.piv), R = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(...M.axis), M.ang * k);
+      T.copy(R).setPosition(p.clone().sub(p.clone().applyMatrix4(R)));
+    } else T.makeTranslation(M.t[0] * k, M.t[1] * k, M.t[2] * k);
+    E2.premultiply(T);
+  }
+  BQ.E2.setFromRotationMatrix(E2);
+  const qOf = f => new THREE.Quaternion().slerp(BQ.E2, f);
+  if (TYPE === "E") {
+    for (let k = 1; k <= 3; k++) {
+      const Q = [], Qb = [], sl = [], M0 = [];
+      XU.forEach(xu => {
+        const xs = xu + E_XSB[k];
+        const P1 = V(xs, E_Y1, E_ZC), P2 = V(xs, E_Y2, E_ZC).applyMatrix4(E2);
+        sl.push((P2.y - P1.y) / Math.hypot(P2.x - P1.x, P2.z - P1.z)); M0.push(mid(P1, P2));
+        const B0 = V(xs, YBEAM[k], E_ZC);
+        Qb.push(B0); Q.push(B0.clone().lerp(B0.clone().applyMatrix4(E2), k / 4));   // plan: k/4 of E2's movement
+      });
+      // height: best fit of the rigid beam to the four bearings (both ends of both support beams)
+      const s = (sl[0] + sl[1]) / 2;
+      Q.forEach((q, u) => { q.y = M0[u].y + s * (M0[u].z - q.z); });
+      const a1 = Q[1].clone().sub(Q[0]).normalize();
+      const b1 = BR.clone().applyQuaternion(qOf(k / 4)); b1.y = 0; b1.normalize(); b1.y = s;
+      b1.addScaledVector(a1, -b1.dot(a1)).normalize();
+      frame(BODY["B" + k], BQ["B" + k], AX, BR, a1, b1, mid(Qb[0], Qb[1]), mid(Q[0], Q[1]));
+    }
+    halfBody("H01", "B1", "E1"); halfBody("H12", "B1", "B2"); halfBody("H23", "B2", "B3");
+  } else {
+    const qHalf = qOf(0.5), L = [];
+    XU.forEach((xu, u) => {
+      const m = u ? 1 : -1;
+      const P1 = V(xu + m * ES_DX, -ES_Y, ES_ZC), P2b = V(xu - m * ES_DX, ES_Y, ES_ZC), P2 = P2b.clone().applyMatrix4(E2);
+      const b0 = P2b.clone().sub(P1).normalize(), b1 = P2.clone().sub(P1).normalize();
+      const a0 = new THREE.Vector3().crossVectors(b0, UP).normalize();
+      const a1 = a0.clone().applyQuaternion(qHalf); a1.addScaledVector(b1, -a1.dot(b1)).normalize();
+      frame(BODY["S" + u], BQ["S" + u], a0, b0, a1, b1, mid(P1, P2b), mid(P1, P2));
+      L.push([P1, P2b, P2]);
+    });
+    for (let k = 1; k <= 3; k++) {
+      const Q = L.map(([P1, , P2]) => P1.clone().lerp(P2, k / 4)), Qb = L.map(([P1, P2b]) => P1.clone().lerp(P2b, k / 4));
+      const a1 = Q[1].clone().sub(Q[0]).normalize();
+      const b1 = BR.clone().applyQuaternion(qOf(k / 4)); b1.addScaledVector(a1, -b1.dot(a1)).normalize();
+      frame(BODY["B" + k], BQ["B" + k], AX, BR, a1, b1, mid(Qb[0], Qb[1]), mid(Q[0], Q[1]));
+    }
+  }
+}
+const _p0 = new THREE.Vector3(), _n = new THREE.Vector3(), _up = new THREE.Vector3();
+function deformSpring(n) {   // each column of the part is stretched or squeezed onto the top or bottom face of a support beam
+  const E = BODY[n.def.b], S = BODY[n.def.s], zt = n.def.zp * 0.001;
+  _p0.set(0, zt, 0).applyMatrix4(S);                                    // a point on that face
+  _n.set(0, 1, 0).applyQuaternion(BQ[n.def.s]); _up.set(0, 1, 0).applyQuaternion(BQ[n.def.b]);
+  const un = _up.dot(_n);
+  for (const d of n.def.meshes) {
+    const W = d.W, w = d.w, P = d.attr.array;
+    for (let i = 0, k = 0; i < w.length; i++, k += 3) {
+      _a.set(W[k], W[k + 1], W[k + 2]).applyMatrix4(E);
+      _b.set(W[k], zt, W[k + 2]).applyMatrix4(E);
+      const dl = (_p0.dot(_n) - _b.dot(_n)) / un * (1 - w[i]);
+      P[k] = _a.x + _up.x * dl; P[k + 1] = _a.y + _up.y * dl; P[k + 2] = _a.z + _up.z * dl;
+    }
+    d.attr.needsUpdate = true;
+  }
+}
+function deform(n) {
+  if (n.def.spring) return deformSpring(n);
+  const A = BODY[n.def.a].elements, B = BODY[n.def.b].elements;
+  for (const d of n.def.meshes) {
+    const W = d.W, w = d.w, P = d.attr.array;
+    for (let i = 0, k = 0; i < w.length; i++, k += 3) {
+      const x = W[k], y = W[k + 1], z = W[k + 2], t = w[i], s = 1 - t;
+      P[k]     = s * (A[0] * x + A[4] * y + A[8] * z + A[12])  + t * (B[0] * x + B[4] * y + B[8] * z + B[12]);
+      P[k + 1] = s * (A[1] * x + A[5] * y + A[9] * z + A[13])  + t * (B[1] * x + B[5] * y + B[9] * z + B[13]);
+      P[k + 2] = s * (A[2] * x + A[6] * y + A[10] * z + A[14]) + t * (B[2] * x + B[6] * y + B[10] * z + B[14]);
+    }
+    d.attr.needsUpdate = true;
+  }
+}
+function prepDeform(o, def) {   // bake the part into world coordinates so its vertices can be moved directly
+  def.meshes = [];
+  o.updateWorldMatrix(true, true);
+  o.traverse(m => {
+    if (!m.isMesh) return;
+    m.geometry = m.geometry.clone().applyMatrix4(m.matrixWorld);
+    m.frustumCulled = false;
+    const attr = m.geometry.attributes.position, W = Float32Array.from(attr.array), w = new Float32Array(attr.count);
+    for (let i = 0; i < attr.count; i++) w[i] = def.w(W[3 * i] * 1000, -W[3 * i + 2] * 1000, W[3 * i + 1] * 1000);
+    def.meshes.push({ attr, W, w, geo: m.geometry });
+  });
+  o.traverse(m => { m.position.set(0, 0, 0); m.quaternion.identity(); m.scale.set(1, 1, 1); });
+}
+
 function applyExplode() {
-  const f = F0 + explode * (F1 - F0);
-  const d = (gap - 40) * 0.001;
+  const f = F0 + explode * (F1 - F0), off = new THREE.Vector3();
+  solve();
   for (const n of nodes) {
-    n.obj.position.copy(n.base);
+    off.set(0, 0, 0);
     let prev = null;
     for (const s of n.stages) {
       if (f < s.st) break;
       const p = ease(Math.min(1, (f - s.st) / DUR));
-      const o = prev ? prev.clone().lerp(s.off, p) : s.off.clone().multiplyScalar(p);
-      n.obj.position.copy(n.base).add(o);
+      off.copy(prev ? prev.clone().lerp(s.off, p) : s.off.clone().multiplyScalar(p));
       prev = s.off;
     }
-    if (n.stretch) {
-      // centre moves (j-0.5)*d; width scales with the cell opening about the part's own centre
-      const k = Math.max(0.12, (gap + 14) / 54);
-      n.obj.scale.set(n.baseScale.x, n.baseScale.y, n.baseScale.z * k);
-      const shift = (n.j - 0.5) * d;
-      // keep the scaled part centred on its moved centre (origin may not sit at the bbox centre)
-      const oz = n.base.z - n.pivot.z;
-      n.obj.position.z += -shift + oz * (k - 1);
-    } else {
-      n.obj.position.z += -n.j * d;   // Blender +y is three.js -z
-      if (n.swivel) {
-        const sw = n.swivel, a0 = Math.atan2(sw.along, sw.across), a1 = Math.atan2(sw.along, sw.across + 4 * (gap - 40));
-        n.obj.rotation.y = n.baseRot + sw.m * (a1 - a0);   // Blender z-rotation = three.js y-rotation
-      }
+    if (n.def) { n.obj.position.copy(off); deform(n); }
+    else {
+      n.obj.position.copy(n.base).applyMatrix4(BODY[n.body]).add(off);
+      n.obj.quaternion.copy(n.baseQuat).premultiply(BQ[n.body]);
     }
   }
 }
@@ -5508,10 +5760,42 @@ function resize() {
 // re-apply highlight colour when the theme flips
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => selected && select(selected));
 
-for (const fn of ["applyExplode", "select"]) {   // both move parts or change materials and shadows
+for (const fn of ["applyExplode", "select"]) {   // both move parts or change materials
   const f = window[fn];
-  window[fn] = function () { const r = f.apply(this, arguments); dirty = true; renderer.shadowMap.needsUpdate = true; return r; };
+  window[fn] = function () { const r = f.apply(this, arguments); dirty = true; return r; };
 }
+const modeBtns = [...document.querySelectorAll("#modes button")], mcap = document.getElementById("mcap"), exag = document.getElementById("exag");
+function setMode(m) {
+  mode = m; mStart = performance.now(); mPhase = 0;
+  for (const b of modeBtns) b.setAttribute("aria-pressed", String(b.dataset.m === m));
+  mcap.textContent = m ? MODES[m].cap : "ボタンを押すと、その方向の動きを繰り返し再生します。橋軸以外は動きが小さいため、倍率を上げて表示しています。";
+  if (!MODES[m] || MODES[m].gap === undefined) { gap = 40; gapIn.value = 40; gapOut.textContent = "40 mm"; }
+  if (MODES[m]) { mag = MODES[m].mag; document.getElementById("mag").value = String(mag); setView(MODES[m].view); }
+  updExag(); applyExplode();
+}
+function updExag() {
+  const on = !!mode && mode !== "X" && mag > 1;
+  exag.hidden = !on; exag.textContent = on ? `変位を ${mag} 倍に拡大して表示中（橋軸の伸縮は実寸）` : "";
+}
+for (const b of modeBtns) b.addEventListener("click", () => setMode(b.dataset.m));
+document.getElementById("mag").addEventListener("change", e => { mag = +e.target.value; updExag(); applyExplode(); });
+// see-through: the boxes become glassy so the bearings and support beams inside can be watched moving
+let xray = false;
+function applyXray() {
+  for (const n of nodes) {
+    if (!/^09_Box_U\d_E\d$/.test(n.obj.name) || (ghost && n.part !== selected)) continue;   // already faded by "この部品の場所を表示"
+    n.obj.traverse(o => {
+      if (!o.isMesh) return;
+      o.material.transparent = xray; o.material.opacity = xray ? 0.22 : 1; o.material.depthWrite = !xray;
+      o.renderOrder = xray ? 1 : 0;
+      o.material.needsUpdate = true;
+    });
+  }
+  dirty = true;
+}
+{ const f = window.select; window.select = function () { const r = f.apply(this, arguments); applyXray(); return r; }; }
+const xrayBtn = document.getElementById("xray");
+xrayBtn.addEventListener("click", () => { xray = !xray; xrayBtn.setAttribute("aria-pressed", String(xray)); applyXray(); });
 function tick(now) {
   resize();
   if (playing) {
@@ -5519,6 +5803,14 @@ function tick(now) {
     const v = t < 3 ? playing.from + (1 - playing.from) * ease(t / 3) : t < 5 ? 1 : t < 8 ? 1 - ease((t - 5) / 3) : 0;
     setExplode(v);
     if (t >= 8) stopPlay();
+  }
+  if (mode && now - lastMotion >= 33) {          // motion at 30 fps
+    lastMotion = now;
+    const t = (now - mStart) / 1000;
+    mPhase = Math.sin(t * 2 * Math.PI / 4);      // one cycle every 4 s
+    const M = MODES[mode];
+    if (M.gap !== undefined) { gap = Math.round(40 + M.gap * mPhase); gapIn.value = gap; gapOut.textContent = gap + " mm"; }
+    applyExplode();
   }
   if (camAnim) {
     dirty = true;
@@ -5534,6 +5826,12 @@ function tick(now) {
 requestAnimationFrame(tick);
 </script>
 
+<!--viewer-fix-->
+<script>(()=>{try{controls.addEventListener("change",()=>{dirty=true;});}catch(e){}})();</script>
+<script>(()=>{const h=document.querySelector("header"),hud=document.querySelector(".hud"),b=document.getElementById("hudToggle");
+const fit=()=>document.documentElement.style.setProperty("--hdr",(h&&getComputedStyle(h).display!=="none"?h.offsetHeight:0)+"px");fit();addEventListener("resize",fit);
+if(b&&hud){hud.id=hud.id||"hud";b.addEventListener("click",()=>{const c=hud.classList.toggle("closed");b.textContent=c?"操作を表示":"操作を隠す";b.setAttribute("aria-expanded",String(!c));});}})();</script>
+<!--/viewer-fix-->
 <!--site-nav-->
 <style>.site-home{font:500 13px/1 var(--font-ui,sans-serif);color:var(--accent,#1f6fb2);text-decoration:none;border:1.5px solid currentColor;border-radius:4px;padding:6px 10px;align-self:center;white-space:nowrap;background:var(--panel,#fff)}
 .site-home.float{position:fixed;z-index:50;top:max(6px,env(safe-area-inset-top,0px));left:max(6px,env(safe-area-inset-left,0px));opacity:.94}</style>
